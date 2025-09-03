@@ -1,0 +1,11 @@
+# Build
+/dist
+
+# Node
+/node_modules
+
+# Package lock (якщо вирішиш ігнорити)
+package-lock.json
+
+# IDE
+.vscode/
