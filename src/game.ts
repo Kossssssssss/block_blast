@@ -45,6 +45,10 @@ export class Game
     canvas.addEventListener( "mousedown", this.onMouseDown );
     canvas.addEventListener( "mousemove", this.onMouseMove );
     canvas.addEventListener( "mouseup", this.onMouseUp );
+
+    canvas.addEventListener( "touchstart", this.onTouchStart, { passive: false } );
+    canvas.addEventListener( "touchmove", this.onTouchMove, { passive: false } );
+    canvas.addEventListener( "touchend", this.onTouchEnd );
   }
 
   start()
@@ -316,5 +320,36 @@ export class Game
       this.held_piece.resetToSlot();
       this.held_piece = null;
     }
+  };
+
+  private getTouchPos( e: TouchEvent )
+  {
+    const rect = this.ctx.canvas.getBoundingClientRect();
+    const touch = e.touches[0] || e.changedTouches[0];
+    return {
+      offsetX: touch.clientX - rect.left,
+      offsetY: touch.clientY - rect.top
+    };
+  }
+
+  private onTouchStart = ( e: TouchEvent ) =>
+  {
+    e.preventDefault();
+    const pos = this.getTouchPos( e );
+    this.onMouseDown( { offsetX: pos.offsetX, offsetY: pos.offsetY } as MouseEvent );
+  };
+
+  private onTouchMove = ( e: TouchEvent ) =>
+  {
+    e.preventDefault();
+    const pos = this.getTouchPos( e );
+    this.onMouseMove( { offsetX: pos.offsetX, offsetY: pos.offsetY } as MouseEvent );
+  };
+
+  private onTouchEnd = ( e: TouchEvent ) =>
+  {
+    e.preventDefault();
+    const pos = this.getTouchPos( e );
+    this.onMouseUp( { offsetX: pos.offsetX, offsetY: pos.offsetY } as MouseEvent );
   };
 }

@@ -62,6 +62,21 @@ export class Game {
                 this.held_piece = null;
             }
         };
+        this.onTouchStart = (e) => {
+            e.preventDefault();
+            const pos = this.getTouchPos(e);
+            this.onMouseDown({ offsetX: pos.offsetX, offsetY: pos.offsetY });
+        };
+        this.onTouchMove = (e) => {
+            e.preventDefault();
+            const pos = this.getTouchPos(e);
+            this.onMouseMove({ offsetX: pos.offsetX, offsetY: pos.offsetY });
+        };
+        this.onTouchEnd = (e) => {
+            e.preventDefault();
+            const pos = this.getTouchPos(e);
+            this.onMouseUp({ offsetX: pos.offsetX, offsetY: pos.offsetY });
+        };
         const board_size = 8;
         const max_board_width = this.ctx.canvas.width * 0.9;
         const max_board_height = this.ctx.canvas.height * 0.45;
@@ -77,6 +92,9 @@ export class Game {
         canvas.addEventListener("mousedown", this.onMouseDown);
         canvas.addEventListener("mousemove", this.onMouseMove);
         canvas.addEventListener("mouseup", this.onMouseUp);
+        canvas.addEventListener("touchstart", this.onTouchStart, { passive: false });
+        canvas.addEventListener("touchmove", this.onTouchMove, { passive: false });
+        canvas.addEventListener("touchend", this.onTouchEnd);
     }
     start() {
         requestAnimationFrame(this.loop);
@@ -202,5 +220,13 @@ export class Game {
             piece.setSlot(current_x, start_y, piece_size);
             current_x += piece.getWidth() * piece_size + inner_gap;
         });
+    }
+    getTouchPos(e) {
+        const rect = this.ctx.canvas.getBoundingClientRect();
+        const touch = e.touches[0] || e.changedTouches[0];
+        return {
+            offsetX: touch.clientX - rect.left,
+            offsetY: touch.clientY - rect.top
+        };
     }
 }
