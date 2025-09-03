@@ -94,14 +94,11 @@ export class Game
 
     if ( this.held_piece )
     {
-      const piece_width_px = this.held_piece.getWidth() * this.board.cell_size;
-      const piece_height_px = this.held_piece.getHeight() * this.board.cell_size;
+      const preview_x = this.held_piece.draw_x;
+      const preview_y = this.held_piece.draw_y;
 
-      const center_x = this.mouse_x - piece_width_px / 2;
-      const center_y = this.mouse_y - piece_height_px / 2 - this.board.cell_size * 0.6;
-
-      const row = Math.round( ( center_y - this.board_y ) / this.board.cell_size );
-      const col = Math.round( ( center_x - this.board_x ) / this.board.cell_size );
+      const row = Math.round( ( preview_y - this.board_y ) / this.board.cell_size );
+      const col = Math.round( ( preview_x - this.board_x ) / this.board.cell_size );
 
       if ( this.board.canPlacePiece( this.held_piece, row, col ) )
       {
@@ -123,7 +120,7 @@ export class Game
 
       this.held_piece.setDrawPos(
         this.mouse_x - piece_width_px / 2,
-        this.mouse_y - piece_height_px / 2 - 30,
+        this.mouse_y - piece_height_px / 2 - 100,
         this.board.cell_size
       );
 
