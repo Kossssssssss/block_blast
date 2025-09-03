@@ -135,7 +135,7 @@ export class Game {
         if (this.held_piece) {
             const piece_width_px = this.held_piece.getWidth() * this.board.cell_size;
             const piece_height_px = this.held_piece.getHeight() * this.board.cell_size;
-            this.held_piece.setDrawPos(this.mouse_x - piece_width_px / 2, this.mouse_y - piece_height_px / 2 - 100, this.board.cell_size);
+            this.held_piece.setDrawPos(this.mouse_x - piece_width_px / 2, this.mouse_y - piece_height_px / 2 - 130, this.board.cell_size);
             this.held_piece.render(this.ctx);
         }
     }

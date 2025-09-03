@@ -52,15 +52,18 @@ export class Piece
     }
   }
 
-  public hitTest( x: number, y: number ): boolean
+  hitTest( x: number, y: number ): boolean
   {
     const width = this.getWidth() * this.draw_size;
     const height = this.getHeight() * this.draw_size;
+
+    const padding = 20;
+
     return (
-      x >= this.draw_x &&
-      x <= this.draw_x + width &&
-      y >= this.draw_y &&
-      y <= this.draw_y + height
+      x >= this.draw_x - padding &&
+      x <= this.draw_x + width + padding &&
+      y >= this.draw_y - padding &&
+      y <= this.draw_y + height + padding
     );
   }
 

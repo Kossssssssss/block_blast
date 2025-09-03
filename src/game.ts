@@ -120,7 +120,7 @@ export class Game
 
       this.held_piece.setDrawPos(
         this.mouse_x - piece_width_px / 2,
-        this.mouse_y - piece_height_px / 2 - 100,
+        this.mouse_y - piece_height_px / 2 - 130,
         this.board.cell_size
       );
 
