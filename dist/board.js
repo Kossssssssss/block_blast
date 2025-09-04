@@ -6,14 +6,73 @@ export class Board {
         this.cols = cols;
         this.cell_size = cell_size;
         this.grid = [];
-        this.initGrid();
+        this.generateInitialBoard();
     }
     reset() {
+        this.generateInitialBoard();
+    }
+    generateInitialBoard() {
+        this.grid = [];
+        for (let r = 0; r < this.rows; r++) {
+            const row = [];
+            for (let c = 0; c < this.cols; c++) {
+                row.push(new Cell(this.ctx, this.cell_size, false));
+            }
+            this.grid.push(row);
+        }
         for (let r = 0; r < this.rows; r++) {
             for (let c = 0; c < this.cols; c++) {
-                this.grid[r][c].filled = Math.random() < 0.55;
+                this.grid[r][c].filled = Math.random() < 0.5;
             }
         }
+        for (let r = 0; r < this.rows; r++) {
+            for (let c = 0; c < this.cols; c++) {
+                if (!this.grid[r][c].filled) {
+                    let surrounded = true;
+                    for (let dr = -1; dr <= 1; dr++) {
+                        for (let dc = -1; dc <= 1; dc++) {
+                            if (dr === 0 && dc === 0)
+                                continue;
+                            const nr = r + dr;
+                            const nc = c + dc;
+                            if (nr >= 0 && nr < this.rows && nc >= 0 && nc < this.cols) {
+                                if (!this.grid[nr][nc].filled) {
+                                    surrounded = false;
+                                    break;
+                                }
+                            }
+                        }
+                        if (!surrounded)
+                            break;
+                    }
+                    if (surrounded) {
+                        this.grid[r][c].filled = true;
+                    }
+                }
+            }
+        }
+        for (let r = 0; r < this.rows; r++) {
+            if (this.grid[r].every(cell => cell.filled)) {
+                const random_c = Math.floor(Math.random() * this.cols);
+                this.grid[r][random_c].filled = false;
+            }
+        }
+        for (let c = 0; c < this.cols; c++) {
+            let full = true;
+            for (let r = 0; r < this.rows; r++) {
+                if (!this.grid[r][c].filled) {
+                    full = false;
+                    break;
+                }
+            }
+            if (full) {
+                const random_r = Math.floor(Math.random() * this.rows);
+                this.grid[random_r][c].filled = false;
+            }
+        }
+    }
+    getGrid() {
+        return this.grid;
     }
     canPlaceAny(piece) {
         for (let r = 0; r < this.rows; r++) {
@@ -24,16 +83,6 @@ export class Board {
             }
         }
         return false;
-    }
-    initGrid() {
-        for (let r = 0; r < this.rows; r++) {
-            const row = [];
-            for (let c = 0; c < this.cols; c++) {
-                const filled = Math.random() < 0.55;
-                row.push(new Cell(this.ctx, this.cell_size, filled));
-            }
-            this.grid.push(row);
-        }
     }
     render() {
         this.renderBackground();

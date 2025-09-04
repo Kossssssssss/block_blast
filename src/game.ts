@@ -1,6 +1,7 @@
 import { Board } from "./board.js";
 import { Piece } from "./piece.js";
 import { PieceFactory } from "./piece_factory.js";
+import { SmartPieceFactory } from "./smart_piece_factory.js";
 
 export class Game
 {
@@ -181,54 +182,20 @@ export class Game
 
   private generatePieces()
   {
-    let attempts = 0;
+    const smartFactory = new SmartPieceFactory( this.board );
+    const pieces = smartFactory.pickPieces();
 
-    while ( attempts < 200 )
+    if( !pieces )
     {
-      attempts++;
-      const test_board = this.board.clone();
-      const pieces: Piece[] = [];
-      let success = true;
+      console.warn( "⚠️ SmartPieceFactory: not found 3 pieces, shuffle board" );
 
-      for ( let i = 0; i < 3; i++ )
-      {
-        let piece: Piece;
-        let placed = false;
-        let tries = 0;
-
-        do
-        {
-          piece = PieceFactory.randomPiece();
-          tries++;
-
-          const pos = test_board.findPlacementFor( piece );
-          if ( pos )
-          {
-            test_board.placePiece( piece, pos.row, pos.col );
-            pieces.push( piece );
-            placed = true;
-            break;
-          }
-        } while ( tries < 50 );
-
-        if ( !placed )
-        {
-          success = false;
-          break;
-        }
-      }
-
-      if ( success )
-      {
-        this.pieces = pieces;
-        this.layoutPieces();
-        return;
-      }
+      this.board.reset();
+      this.generatePieces();
+      return;
     }
 
-    console.warn( "Не знайшли комбінацію, очищаємо поле..." );
-    this.board.reset();
-    this.generatePieces();
+    this.pieces = pieces;
+    this.layoutPieces();
   }
 
   private layoutPieces()
