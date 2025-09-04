@@ -1,14 +1,16 @@
-import { Board } from "./board.js";
-import { Piece } from "./piece.js";
-import { PieceFactory } from "./piece_factory.js";
-import { SmartPieceFactory } from "./smart_piece_factory.js";
+import { Button } from "../components/button.js";
+import { ScreenManager, Screens } from "../screen_manager.js";
+import { IScreen } from "../types/screen.interface.js";
+import { Board } from "./board/board.js";
+import { Piece } from "./piece/piece.js";
+import { SmartPieceFactory } from "./piece/smart_piece_factory.js";
 
-export class Game
+export class Game implements IScreen
 {
-  private board: Board;
+  private board!: Board;
 
-  private board_x: number;
-  private board_y: number;
+  private board_x!: number;
+  private board_y!: number;
 
   private pieces: Piece[] = [];
   private held_piece: Piece | null = null;
@@ -16,12 +18,53 @@ export class Game
   private mouse_x = 0;
   private mouse_y = 0;
 
-  private score:      number = 0;
+  private score:       number = 0;
   private line_clears: number = 0;
 
   private is_game_over = false;
+  private loop_id: number | null = null;
+
+  private exit_btn!: Button;
 
   constructor( private ctx: CanvasRenderingContext2D )
+  {
+    this.initEvents();
+    this.createExitButton();
+    this.createBoard();
+    this.generatePieces();
+  }
+
+  start()
+  {
+    this.is_game_over = false;
+    this.loop_id = requestAnimationFrame( this.loop );
+  }
+
+  private createExitButton()
+  {
+    this.exit_btn = new Button(
+      this.ctx,
+      20,
+      20,
+      120,
+      40,
+      "EXIT",
+      () => ScreenManager.show( Screens.MENU ),
+      {
+        fill_color: "#e74c3c",
+        border_width: 0,
+        radius: 8,
+        text_color: "#fff",
+        shadow_color: "rgba(0,0,0,0.4)",
+        shadow_blur: 6,
+        shadow_offset_x: 2,
+        shadow_offset_y: 2,
+        font: "bold 20px Arial"
+      }
+    );
+  }
+
+  private createBoard()
   {
     const board_size = 8;
 
@@ -38,23 +81,66 @@ export class Game
     this.board_x = ( this.ctx.canvas.width - final_board_width ) / 2;
     this.board_y = ( this.ctx.canvas.height - final_board_height ) / 2.5;
 
-    this.board = new Board( ctx, board_size, board_size, cell_size );
+    this.board = new Board( this.ctx, board_size, board_size, cell_size );
+  }
 
-    this.generatePieces();
+  private handleMouseDown = ( e: MouseEvent ) =>
+  {
+    this.exit_btn.handleMouseDown( e.offsetX, e.offsetY );
+  };
 
+  private handleMouseUp = ( e: MouseEvent ) =>
+  {
+    this.exit_btn.handleMouseUp( e.offsetX, e.offsetY );
+  };
+
+  private initEvents()
+  {
     const canvas = this.ctx.canvas;
     canvas.addEventListener( "mousedown", this.onMouseDown );
     canvas.addEventListener( "mousemove", this.onMouseMove );
     canvas.addEventListener( "mouseup", this.onMouseUp );
 
+    canvas.addEventListener( "mousedown", this.handleMouseDown );
+    canvas.addEventListener( "mouseup", this.handleMouseUp );
+    
     canvas.addEventListener( "touchstart", this.onTouchStart, { passive: false } );
     canvas.addEventListener( "touchmove", this.onTouchMove, { passive: false } );
     canvas.addEventListener( "touchend", this.onTouchEnd );
   }
 
-  start()
+  private removeEvents()
   {
-    requestAnimationFrame( this.loop );
+    const canvas = this.ctx.canvas;
+    canvas.removeEventListener( "mousedown", this.onMouseDown );
+    canvas.removeEventListener( "mousemove", this.onMouseMove );
+    canvas.removeEventListener( "mouseup", this.onMouseUp );
+
+    canvas.removeEventListener( "mousedown", this.handleMouseDown );
+    canvas.removeEventListener( "mouseup", this.handleMouseUp );
+
+    canvas.removeEventListener( "touchstart", this.onTouchStart );
+    canvas.removeEventListener( "touchmove", this.onTouchMove );
+    canvas.removeEventListener( "touchend", this.onTouchEnd );
+  }
+
+  public destroy()
+  {
+    this.is_game_over = true;
+
+    cancelAnimationFrame( this.loop_id! );
+    this.loop_id = null;
+
+    this.removeEvents();
+
+    this.held_piece = null;
+    this.pieces = [];
+    this.board = null as any;
+  }
+
+  private renderExitBtn()
+  {
+    this.exit_btn.render();
   }
 
   private gameOver()
@@ -81,7 +167,7 @@ export class Game
   private loop = () =>
   {
     this.render();
-    requestAnimationFrame( this.loop );
+    this.loop_id = requestAnimationFrame( this.loop );
   };
 
   private render()
@@ -90,6 +176,7 @@ export class Game
     this.ctx.clearRect( 0, 0, this.ctx.canvas.width, this.ctx.canvas.height );
 
     this.renderScore();
+    this.renderExitBtn();
 
     this.board.clearPreview();
 

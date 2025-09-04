@@ -1,17 +1,21 @@
-import { Game } from "./game.js";
+import { ScreenManager, Screens } from "./screen_manager.js";
 window.addEventListener("load", () => {
-    const canvas = document.getElementById("gameCanvas");
-    const ctx = canvas.getContext("2d");
+    const game_canvas = document.getElementById("gameCanvas");
+    const game_ctx = game_canvas.getContext("2d");
+    const menu_canvas = document.getElementById("menuCanvas");
+    const menu_ctx = menu_canvas.getContext("2d");
+    ScreenManager.register(Screens.MENU, menu_canvas);
+    ScreenManager.register(Screens.GAME, game_canvas);
     function resizeCanvas() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        game_canvas.width = window.innerWidth;
+        game_canvas.height = window.innerHeight;
+        menu_canvas.width = window.innerWidth;
+        menu_canvas.height = window.innerHeight;
     }
     resizeCanvas();
     window.addEventListener("resize", resizeCanvas);
-    if (!ctx) {
+    if (!game_ctx || !menu_ctx) {
         throw new Error("Canvas context not found!");
     }
-    const game = new Game(ctx);
-    game.start();
-    document.getElementById("resetBtn")?.addEventListener("click", () => game.resetGame());
+    ScreenManager.show(Screens.MENU);
 });

@@ -1,7 +1,7 @@
-import { Board } from "./board.js";
+import { Board } from "../board/board.js";
 import { Piece } from "./piece.js";
 import { PieceFactory } from "./piece_factory.js";
-import { PIECE_COLORS } from "./utils/colors.js";
+import { PIECE_COLORS } from "../../utils/colors.js";
 
 export class SmartPieceFactory
 {

@@ -1,4 +1,4 @@
-import { Cell } from "./cell.js";
+import { Cell } from "../board/cell.js";
 
 export class Piece
 {

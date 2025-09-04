@@ -1,5 +1,5 @@
-import { hexToRgba } from "./utils/hex_to_rgba.js";
-import { shadeColor } from "./utils/shade_color.js";
+import { hexToRgba } from "../../utils/hex_to_rgba.js";
+import { shadeColor } from "../../utils/shade_color.js";
 
 export class Cell
 {
