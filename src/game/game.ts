@@ -21,11 +21,14 @@ export class Game implements IScreen
   private mouse_x = 0;
   private mouse_y = 0;
 
-  private score:       number = 0;
   private line_clears: number = 0;
 
   private is_game_over = false;
   private loop_id: number | null = null;
+
+  private score:         number = 0; 
+  private display_score: number = 0; 
+  // private score_speed:   number = 1000; 
 
   private exit_btn!: Button;
 
@@ -214,8 +217,24 @@ export class Game implements IScreen
   private render()
   {
     if ( this.is_game_over ) return; 
+
     this.ctx.clearRect( 0, 0, this.ctx.canvas.width, this.ctx.canvas.height );
 
+    if ( this.display_score < this.score )
+    {
+      const diff = this.score - this.display_score;
+
+      const base_increment = 1 / 60;
+
+      const increment = Math.min( diff, Math.max( 0.1, diff * base_increment ) );
+
+      this.display_score += increment;
+
+      if ( this.display_score > this.score )
+      {
+        this.display_score = this.score;
+      }
+    }
     this.renderScore();
     this.renderExitBtn();
 
@@ -290,7 +309,7 @@ export class Game implements IScreen
     this.ctx.font = "bold 40px Arial";
     this.ctx.textAlign = "center";
     this.ctx.fillText(
-      `Score: ${this.score}`,
+      `Score: ${Math.floor( this.display_score )}`,
       this.ctx.canvas.width / 2,
       this.board_y - 40
     );
@@ -400,6 +419,10 @@ export class Game implements IScreen
       const cleared = this.board.clearFullLines();
       const lines_cleared = cleared.rows + cleared.cols;
       this.pieces = this.pieces.filter( p => p !== this.held_piece );
+
+      const piece_blocks = this.held_piece.getBlocksCount();
+      this.score += piece_blocks;
+
       this.held_piece = null;
 
       if ( lines_cleared > 0 )

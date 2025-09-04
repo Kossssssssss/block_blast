@@ -12,10 +12,11 @@ export class Game {
         this.held_piece = null;
         this.mouse_x = 0;
         this.mouse_y = 0;
-        this.score = 0;
         this.line_clears = 0;
         this.is_game_over = false;
         this.loop_id = null;
+        this.score = 0;
+        this.display_score = 0;
         this.handleMouseDown = (e) => {
             this.exit_btn.handleMouseDown(e.offsetX, e.offsetY);
         };
@@ -81,6 +82,8 @@ export class Game {
                 const cleared = this.board.clearFullLines();
                 const lines_cleared = cleared.rows + cleared.cols;
                 this.pieces = this.pieces.filter(p => p !== this.held_piece);
+                const piece_blocks = this.held_piece.getBlocksCount();
+                this.score += piece_blocks;
                 this.held_piece = null;
                 if (lines_cleared > 0) {
                     if (lines_cleared === 1) {
@@ -215,6 +218,15 @@ export class Game {
         if (this.is_game_over)
             return;
         this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+        if (this.display_score < this.score) {
+            const diff = this.score - this.display_score;
+            const base_increment = 1 / 60;
+            const increment = Math.min(diff, Math.max(0.1, diff * base_increment));
+            this.display_score += increment;
+            if (this.display_score > this.score) {
+                this.display_score = this.score;
+            }
+        }
         this.renderScore();
         this.renderExitBtn();
         this.board.clearPreview();
@@ -260,7 +272,7 @@ export class Game {
         this.ctx.fillStyle = "#fff";
         this.ctx.font = "bold 40px Arial";
         this.ctx.textAlign = "center";
-        this.ctx.fillText(`Score: ${this.score}`, this.ctx.canvas.width / 2, this.board_y - 40);
+        this.ctx.fillText(`Score: ${Math.floor(this.display_score)}`, this.ctx.canvas.width / 2, this.board_y - 40);
         this.ctx.restore();
     }
     renderPieces() {

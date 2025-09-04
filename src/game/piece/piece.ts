@@ -52,6 +52,13 @@ export class Piece
     }
   }
 
+  public getBlocksCount(): number
+  {
+    return this.shape.reduce( ( sum, row ) =>
+      sum + row.filter( cell => cell !== 0 ).length, 0
+    );
+  }
+
   hitTest( x: number, y: number ): boolean
   {
     const width = this.getWidth() * this.draw_size;

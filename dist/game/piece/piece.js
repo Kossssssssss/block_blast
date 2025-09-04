@@ -39,6 +39,9 @@ export class Piece {
             }
         }
     }
+    getBlocksCount() {
+        return this.shape.reduce((sum, row) => sum + row.filter(cell => cell !== 0).length, 0);
+    }
     hitTest(x, y) {
         const width = this.getWidth() * this.draw_size;
         const height = this.getHeight() * this.draw_size;
