@@ -19,6 +19,22 @@ export class Game {
         this.handleMouseUp = (e) => {
             this.exit_btn.handleMouseUp(e.offsetX, e.offsetY);
         };
+        this.handleTouchStart = (e) => {
+            e.preventDefault();
+            const rect = this.ctx.canvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            const offset_x = touch.clientX - rect.left;
+            const offset_y = touch.clientY - rect.top;
+            this.exit_btn.handleMouseDown(offset_x, offset_y);
+        };
+        this.handleTouchEnd = (e) => {
+            e.preventDefault();
+            const rect = this.ctx.canvas.getBoundingClientRect();
+            const touch = e.changedTouches[0];
+            const offset_x = touch.clientX - rect.left;
+            const offset_y = touch.clientY - rect.top;
+            this.exit_btn.handleMouseUp(offset_x, offset_y);
+        };
         this.loop = () => {
             this.render();
             this.loop_id = requestAnimationFrame(this.loop);
@@ -127,6 +143,8 @@ export class Game {
         canvas.addEventListener("mouseup", this.onMouseUp);
         canvas.addEventListener("mousedown", this.handleMouseDown);
         canvas.addEventListener("mouseup", this.handleMouseUp);
+        canvas.addEventListener("touchstart", this.handleTouchStart);
+        canvas.addEventListener("touchend", this.handleTouchEnd);
         canvas.addEventListener("touchstart", this.onTouchStart, { passive: false });
         canvas.addEventListener("touchmove", this.onTouchMove, { passive: false });
         canvas.addEventListener("touchend", this.onTouchEnd);
@@ -138,6 +156,8 @@ export class Game {
         canvas.removeEventListener("mouseup", this.onMouseUp);
         canvas.removeEventListener("mousedown", this.handleMouseDown);
         canvas.removeEventListener("mouseup", this.handleMouseUp);
+        canvas.removeEventListener("touchstart", this.handleTouchStart);
+        canvas.removeEventListener("touchend", this.handleTouchEnd);
         canvas.removeEventListener("touchstart", this.onTouchStart);
         canvas.removeEventListener("touchmove", this.onTouchMove);
         canvas.removeEventListener("touchend", this.onTouchEnd);

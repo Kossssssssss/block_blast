@@ -23,17 +23,3 @@ canvas {
   width: 100vw;     
   height: 100vh;   
 }
-
-#resetBtn {
-  position: absolute;
-  left: 20px;
-  top: 20px;
-  padding: 10px 20px;
-  font-size: 18px;
-  font-weight: bold;
-  border: none;
-  border-radius: 6px;
-  background: #e74c3c;
-  color: white;
-  cursor: pointer;
-}
