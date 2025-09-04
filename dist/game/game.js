@@ -254,6 +254,7 @@ export class Game {
     resetGame() {
         this.is_game_over = false;
         this.score = 0;
+        this.display_score = 0;
         this.line_clears = 0;
         const board_size = 8;
         const max_board_width = this.ctx.canvas.width * 0.9;

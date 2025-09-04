@@ -280,6 +280,7 @@ export class Game implements IScreen
   {
     this.is_game_over = false;
     this.score = 0;
+    this.display_score = 0;
     this.line_clears = 0;
 
     const board_size = 8;
