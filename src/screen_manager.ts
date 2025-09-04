@@ -31,7 +31,6 @@ export class ScreenManager
 
     if ( this.current && this.instances[this.current] )
     {
-      console.log('destroy', this.current, this.instances[this.current]);
       this.instances[this.current]!.destroy();
       this.instances[this.current] = null;
     }

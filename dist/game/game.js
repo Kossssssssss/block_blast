@@ -1,3 +1,5 @@
+import { AudioClips } from "../audio/audio_constants.js";
+import { audioController } from "../audio/audio_controller.js";
 import { Button } from "../components/button.js";
 import { Text } from "../components/text.js";
 import { ScreenManager, Screens } from "../screen_manager.js";
@@ -47,6 +49,14 @@ export class Game {
                     this.held_piece = p;
                     this.mouse_x = offsetX;
                     this.mouse_y = offsetY;
+                    const piece_size = p.getWidth() * p.getHeight();
+                    console.log('piece_size', piece_size);
+                    if (piece_size <= 4) {
+                        audioController.playSound(AudioClips.PICK_SMALL);
+                    }
+                    else {
+                        audioController.playSound(AudioClips.PICK_BIG);
+                    }
                     break;
                 }
             }
@@ -61,11 +71,24 @@ export class Game {
             const row = Math.round((this.held_piece.draw_y - this.board_y) / this.board.cell_size);
             const col = Math.round((this.held_piece.draw_x - this.board_x) / this.board.cell_size);
             if (this.board.placePiece(this.held_piece, row, col)) {
+                const piece_size = this.held_piece.getWidth() * this.held_piece.getHeight();
+                if (piece_size <= 4) {
+                    audioController.playSound(AudioClips.PUT_SMALL);
+                }
+                else {
+                    audioController.playSound(AudioClips.PUT_BIG);
+                }
                 const cleared = this.board.clearFullLines();
                 const lines_cleared = cleared.rows + cleared.cols;
                 this.pieces = this.pieces.filter(p => p !== this.held_piece);
                 this.held_piece = null;
                 if (lines_cleared > 0) {
+                    if (lines_cleared === 1) {
+                        audioController.playSound(AudioClips.COMBO3);
+                    }
+                    else {
+                        audioController.playSound(AudioClips.COMBO2);
+                    }
                     this.line_clears += lines_cleared;
                     this.score += lines_cleared * (this.line_clears * 10);
                 }
@@ -84,6 +107,7 @@ export class Game {
                 }
             }
             else {
+                audioController.playSound(AudioClips.DROP);
                 this.held_piece.resetToSlot();
                 this.held_piece = null;
             }
@@ -176,6 +200,7 @@ export class Game {
         this.exit_btn.render();
     }
     gameOver() {
+        audioController.playSound(AudioClips.LOSE);
         this.is_game_over = true;
         const font_size = Math.min(36, Math.floor(this.ctx.canvas.width * 0.07));
         const game_over_text = new Text(this.ctx, this.ctx.canvas.width / 2, this.ctx.canvas.height / 2, `GAME OVER\nScore: ${this.score}`, font_size, "white", "center");
