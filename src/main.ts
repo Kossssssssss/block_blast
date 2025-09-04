@@ -31,7 +31,7 @@ window.addEventListener( "load", () =>
   }
 
   audioController.LoadAll();
-  audioController.playMusic( AudioClips.MAIN_MUSIC, true );
+  // audioController.playMusic( AudioClips.MAIN_MUSIC, true );
   ScreenManager.show( Screens.MENU );
 } );
 

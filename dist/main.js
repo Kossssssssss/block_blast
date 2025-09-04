@@ -1,4 +1,3 @@
-import { AudioClips } from "./audio/audio_constants.js";
 import { audioController } from "./audio/audio_controller.js";
 import { ScreenManager, Screens } from "./screen_manager.js";
 window.addEventListener("load", () => {
@@ -20,6 +19,6 @@ window.addEventListener("load", () => {
         throw new Error("Canvas context not found!");
     }
     audioController.LoadAll();
-    audioController.playMusic(AudioClips.MAIN_MUSIC, true);
+    // audioController.playMusic( AudioClips.MAIN_MUSIC, true );
     ScreenManager.show(Screens.MENU);
 });
