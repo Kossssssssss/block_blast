@@ -26,9 +26,14 @@ export class Game implements IScreen
   private is_game_over = false;
   private loop_id: number | null = null;
 
-  private score:         number = 0; 
-  private display_score: number = 0; 
-  // private score_speed:   number = 1000; 
+  private score: number = 0;
+  private display_score: number = 0;
+
+  private score_start_value: number = 0;
+  private score_target_value: number = 0;
+  private score_start_time: number = 0;
+
+  private score_animation_duration = 2000; // 2 сек
 
   private exit_btn!: Button;
 
@@ -220,21 +225,14 @@ export class Game implements IScreen
 
     this.ctx.clearRect( 0, 0, this.ctx.canvas.width, this.ctx.canvas.height );
 
-    if ( this.display_score < this.score )
+    const now = performance.now();
+    if ( this.display_score < this.score_target_value )
     {
-      const diff = this.score - this.display_score;
-
-      const base_increment = 1 / 60;
-
-      const increment = Math.min( diff, Math.max( 0.1, diff * base_increment ) );
-
-      this.display_score += increment;
-
-      if ( this.display_score > this.score )
-      {
-        this.display_score = this.score;
-      }
+      const elapsed = now - this.score_start_time;
+      const t = Math.min( 1, elapsed / this.score_animation_duration );
+      this.display_score = this.score_start_value + ( this.score_target_value - this.score_start_value ) * t;
     }
+
     this.renderScore();
     this.renderExitBtn();
 
@@ -281,6 +279,9 @@ export class Game implements IScreen
     this.is_game_over = false;
     this.score = 0;
     this.display_score = 0;
+    this.score_start_value = 0;
+    this.score_target_value = 0;
+    this.score_start_time = 0;
     this.line_clears = 0;
 
     const board_size = 8;
@@ -423,6 +424,16 @@ export class Game implements IScreen
 
       const piece_blocks = this.held_piece.getBlocksCount();
       this.score += piece_blocks;
+      this.score_start_value = this.display_score;
+      this.score_target_value = this.score;
+      this.score_start_time = performance.now();
+
+      const diff = Math.abs( this.score_target_value - this.score_start_value );
+
+      this.score_animation_duration = Math.min(
+        2000,
+        Math.max( 500, diff * 10 )
+      );
 
       this.held_piece = null;
 
@@ -438,6 +449,16 @@ export class Game implements IScreen
 
         this.line_clears += lines_cleared;
         this.score += lines_cleared * ( this.line_clears * 10 );
+        this.score_start_value = this.display_score;
+        this.score_target_value = this.score;
+        this.score_start_time = performance.now();
+
+        const diff = Math.abs( this.score_target_value - this.score_start_value );
+
+        this.score_animation_duration = Math.min(
+          2000, 
+          Math.max( 500, diff * 10 )
+        );
       }
 
       if ( this.pieces.length === 0 )

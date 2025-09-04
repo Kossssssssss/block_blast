@@ -17,6 +17,10 @@ export class Game {
         this.loop_id = null;
         this.score = 0;
         this.display_score = 0;
+        this.score_start_value = 0;
+        this.score_target_value = 0;
+        this.score_start_time = 0;
+        this.score_animation_duration = 2000; // 2 сек
         this.handleMouseDown = (e) => {
             this.exit_btn.handleMouseDown(e.offsetX, e.offsetY);
         };
@@ -84,6 +88,11 @@ export class Game {
                 this.pieces = this.pieces.filter(p => p !== this.held_piece);
                 const piece_blocks = this.held_piece.getBlocksCount();
                 this.score += piece_blocks;
+                this.score_start_value = this.display_score;
+                this.score_target_value = this.score;
+                this.score_start_time = performance.now();
+                const diff = Math.abs(this.score_target_value - this.score_start_value);
+                this.score_animation_duration = Math.min(2000, Math.max(500, diff * 10));
                 this.held_piece = null;
                 if (lines_cleared > 0) {
                     if (lines_cleared === 1) {
@@ -94,6 +103,11 @@ export class Game {
                     }
                     this.line_clears += lines_cleared;
                     this.score += lines_cleared * (this.line_clears * 10);
+                    this.score_start_value = this.display_score;
+                    this.score_target_value = this.score;
+                    this.score_start_time = performance.now();
+                    const diff = Math.abs(this.score_target_value - this.score_start_value);
+                    this.score_animation_duration = Math.min(2000, Math.max(500, diff * 10));
                 }
                 if (this.pieces.length === 0) {
                     this.generatePieces();
@@ -218,14 +232,11 @@ export class Game {
         if (this.is_game_over)
             return;
         this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-        if (this.display_score < this.score) {
-            const diff = this.score - this.display_score;
-            const base_increment = 1 / 60;
-            const increment = Math.min(diff, Math.max(0.1, diff * base_increment));
-            this.display_score += increment;
-            if (this.display_score > this.score) {
-                this.display_score = this.score;
-            }
+        const now = performance.now();
+        if (this.display_score < this.score_target_value) {
+            const elapsed = now - this.score_start_time;
+            const t = Math.min(1, elapsed / this.score_animation_duration);
+            this.display_score = this.score_start_value + (this.score_target_value - this.score_start_value) * t;
         }
         this.renderScore();
         this.renderExitBtn();
@@ -255,6 +266,9 @@ export class Game {
         this.is_game_over = false;
         this.score = 0;
         this.display_score = 0;
+        this.score_start_value = 0;
+        this.score_target_value = 0;
+        this.score_start_time = 0;
         this.line_clears = 0;
         const board_size = 8;
         const max_board_width = this.ctx.canvas.width * 0.9;
