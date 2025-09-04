@@ -15,6 +15,22 @@ export class Menu {
         this.handleMouseUp = (e) => {
             this.start_btn.handleMouseUp(e.offsetX, e.offsetY);
         };
+        this.handleTouchStart = (e) => {
+            e.preventDefault();
+            const rect = this.ctx.canvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            const offset_x = touch.clientX - rect.left;
+            const offset_y = touch.clientY - rect.top;
+            this.start_btn.handleMouseDown(offset_x, offset_y);
+        };
+        this.handleTouchEnd = (e) => {
+            e.preventDefault();
+            const rect = this.ctx.canvas.getBoundingClientRect();
+            const touch = e.changedTouches[0];
+            const offset_x = touch.clientX - rect.left;
+            const offset_y = touch.clientY - rect.top;
+            this.start_btn.handleMouseUp(offset_x, offset_y);
+        };
         this.initEvents();
         this.createComponents();
     }
@@ -45,10 +61,14 @@ export class Menu {
     initEvents() {
         this.ctx.canvas.addEventListener("mousedown", this.handleMouseDown);
         this.ctx.canvas.addEventListener("mouseup", this.handleMouseUp);
+        this.ctx.canvas.addEventListener("touchstart", this.handleTouchStart);
+        this.ctx.canvas.addEventListener("touchend", this.handleTouchEnd);
     }
     removeEvents() {
         this.ctx.canvas.removeEventListener("mousedown", this.handleMouseDown);
         this.ctx.canvas.removeEventListener("mouseup", this.handleMouseUp);
+        this.ctx.canvas.removeEventListener("touchstart", this.handleTouchStart);
+        this.ctx.canvas.removeEventListener("touchend", this.handleTouchEnd);
     }
     destroy() {
         if (this.loop_id) {

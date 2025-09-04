@@ -1,4 +1,5 @@
 import { Button } from "../components/button.js";
+import { Text } from "../components/text.js";
 import { ScreenManager, Screens } from "../screen_manager.js";
 import { Board } from "./board/board.js";
 import { SmartPieceFactory } from "./piece/smart_piece_factory.js";
@@ -176,14 +177,12 @@ export class Game {
     }
     gameOver() {
         this.is_game_over = true;
-        const msg = `GAME OVER\nScore: ${this.score}`;
+        const font_size = Math.min(36, Math.floor(this.ctx.canvas.width * 0.07));
+        const game_over_text = new Text(this.ctx, this.ctx.canvas.width / 2, this.ctx.canvas.height / 2, `GAME OVER\nScore: ${this.score}`, font_size, "white", "center");
         this.ctx.save();
         this.ctx.fillStyle = "rgba(0,0,0,0.7)";
         this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-        this.ctx.fillStyle = "white";
-        this.ctx.font = "bold 48px Arial";
-        this.ctx.textAlign = "center";
-        this.ctx.fillText(msg, this.ctx.canvas.width / 2, this.ctx.canvas.height / 2);
+        game_over_text.render();
         this.ctx.restore();
         setTimeout(() => this.resetGame(), 2000);
     }

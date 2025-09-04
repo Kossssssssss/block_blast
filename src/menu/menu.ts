@@ -84,16 +84,48 @@ export class Menu implements IScreen
     this.start_btn.handleMouseUp( e.offsetX, e.offsetY );
   };
 
+  private handleTouchStart = ( e: TouchEvent ) =>
+  {
+    e.preventDefault();
+
+    const rect = this.ctx.canvas.getBoundingClientRect();
+    const touch = e.touches[0];
+
+    const offset_x = touch.clientX - rect.left;
+    const offset_y = touch.clientY - rect.top;
+
+    this.start_btn.handleMouseDown( offset_x, offset_y );
+  };
+
+  private handleTouchEnd = ( e: TouchEvent ) =>
+  {
+    e.preventDefault();
+
+    const rect = this.ctx.canvas.getBoundingClientRect();
+    const touch = e.changedTouches[0];
+
+    const offset_x = touch.clientX - rect.left;
+    const offset_y = touch.clientY - rect.top;
+
+    this.start_btn.handleMouseUp( offset_x, offset_y );
+  };
+
   private initEvents()
   {
     this.ctx.canvas.addEventListener( "mousedown", this.handleMouseDown );
     this.ctx.canvas.addEventListener( "mouseup", this.handleMouseUp );
+
+    this.ctx.canvas.addEventListener( "touchstart", this.handleTouchStart );
+    this.ctx.canvas.addEventListener( "touchend", this.handleTouchEnd );
   }
 
   private removeEvents()
   {
     this.ctx.canvas.removeEventListener( "mousedown", this.handleMouseDown );
     this.ctx.canvas.removeEventListener( "mouseup", this.handleMouseUp );
+
+    this.ctx.canvas.removeEventListener( "touchstart", this.handleTouchStart );
+    this.ctx.canvas.removeEventListener( "touchend", this.handleTouchEnd );
   }
 
   public destroy()
