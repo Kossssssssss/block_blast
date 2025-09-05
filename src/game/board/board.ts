@@ -34,12 +34,28 @@ export class Board
       this.grid.push( row );
     }
 
+    const total_cells = this.rows * this.cols;
+    const max_filled = Math.floor( total_cells * 0.4 );
+    const all_positions: { r: number; c: number }[] = [];
+
     for ( let r = 0; r < this.rows; r++ )
     {
       for ( let c = 0; c < this.cols; c++ )
       {
-        this.grid[r][c].filled = Math.random() < 0.5;
+        all_positions.push( { r, c } );
       }
+    }
+
+    for ( let i = all_positions.length - 1; i > 0; i-- )
+    {
+      const j = Math.floor( Math.random() * ( i + 1 ) );
+      [all_positions[i], all_positions[j]] = [all_positions[j], all_positions[i]];
+    }
+
+    for ( let i = 0; i < max_filled; i++ )
+    {
+      const { r, c } = all_positions[i];
+      this.grid[r][c].filled = true;
     }
 
     for ( let r = 0; r < this.rows; r++ )
@@ -49,16 +65,13 @@ export class Board
         if ( !this.grid[r][c].filled )
         {
           let surrounded = true;
-
           for ( let dr = -1; dr <= 1; dr++ )
           {
             for ( let dc = -1; dc <= 1; dc++ )
             {
               if ( dr === 0 && dc === 0 ) continue;
-
               const nr = r + dr;
               const nc = c + dc;
-
               if ( nr >= 0 && nr < this.rows && nc >= 0 && nc < this.cols )
               {
                 if ( !this.grid[nr][nc].filled )
@@ -70,35 +83,11 @@ export class Board
             }
             if ( !surrounded ) break;
           }
-
           if ( surrounded )
           {
             this.grid[r][c].filled = true;
           }
         }
-      }
-    }
-
-    for ( let r = 0; r < this.rows; r++ )
-    {
-      if ( this.grid[r].every( cell => cell.filled ) )
-      {
-        const random_c = Math.floor( Math.random() * this.cols );
-        this.grid[r][random_c].filled = false;
-      }
-    }
-
-    for ( let c = 0; c < this.cols; c++ )
-    {
-      let full = true;
-      for ( let r = 0; r < this.rows; r++ )
-      {
-        if ( !this.grid[r][c].filled ) { full = false; break; }
-      }
-      if ( full )
-      {
-        const random_r = Math.floor( Math.random() * this.rows );
-        this.grid[random_r][c].filled = false;
       }
     }
   }

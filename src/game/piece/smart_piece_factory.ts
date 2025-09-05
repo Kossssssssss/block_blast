@@ -10,35 +10,47 @@ export class SmartPieceFactory
   pickPieces(): Piece[] | null
   {
     const fake_board = this.board.clone();
-    const scored: { piece: Piece; score: number }[] = [];
-
-    for ( const shape of PieceFactory.shapes )
-    {
-      const piece = new Piece(
-        shape,
-        PIECE_COLORS[Math.floor( Math.random() * PIECE_COLORS.length )]
-      );
-      const score = this.evaluatePiece( fake_board, piece );
-      scored.push( { piece, score } );
-    }
-
-    scored.sort( ( a, b ) => b.score - a.score );
-
     const result: Piece[] = [];
-    for ( const { piece } of scored )
-    {
-      const pos = fake_board.findPlacementFor( piece );
-      if ( pos )
-      {
-        fake_board.placePiece( piece, pos.row, pos.col );
-        result.push( piece );
-      }
-      if ( result.length === 3 ) break;
-    }
 
-    if ( result.length < 3 )
+    for ( let k = 0; k < 3; k++ )
     {
-      return null;
+      let candidates: { piece: Piece, score: number, row: number, col: number }[] = [];
+
+      for ( const shape of PieceFactory.shapes )
+      {
+        const piece = new Piece(
+          shape,
+          PIECE_COLORS[Math.floor( Math.random() * PIECE_COLORS.length )]
+        );
+
+        for ( let row = 0; row < fake_board.rows; row++ )
+        {
+          for ( let col = 0; col < fake_board.cols; col++ )
+          {
+            if ( fake_board.canPlacePiece( piece, row, col ) )
+            {
+              const clone = fake_board.clone();
+              clone.placePiece( piece, row, col );
+              const cleared = clone.clearFullLines();
+              const cleared_count = cleared.rows + cleared.cols;
+
+              const score = this.evaluatePiece( fake_board, piece ) + cleared_count * 100;
+              candidates.push( { piece, score, row, col } );
+            }
+          }
+        }
+      }
+
+      if ( candidates.length === 0 ) return null;
+
+      candidates.sort( ( a, b ) => b.score - a.score );
+      const top_7 = candidates.slice( 0, 7 );
+      const best = top_7[Math.floor( Math.random() * top_7.length )];
+
+      fake_board.placePiece( best.piece, best.row, best.col );
+      fake_board.clearFullLines();
+
+      result.push( best.piece );
     }
 
     return result;
@@ -46,7 +58,9 @@ export class SmartPieceFactory
 
   private evaluatePiece( board: Board, piece: Piece ): number
   {
-    let score = piece.getWidth() * piece.getHeight();
+    const blocks = piece.getBlocksCount();
+
+    let score = blocks <= 4 ? blocks * 10 : blocks * 5;
 
     for ( let row = 0; row < board.rows; row++ )
     {
@@ -87,6 +101,9 @@ export class SmartPieceFactory
         }
       }
     }
+
+    score += Math.random() * 30;
+
     return score;
   }
 }

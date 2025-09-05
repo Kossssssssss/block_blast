@@ -380,7 +380,6 @@ export class Game implements IScreen
         this.mouse_y = offsetY;
 
         const piece_size = p.getWidth() * p.getHeight();
-        console.log('piece_size', piece_size);
         if ( piece_size <= 4 )
         {
           audioController.playSound( AudioClips.PICK_SMALL );
